@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Webview</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        #video {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            border: 2px solid #000;
+        }
+        #captureButton {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+        #captureButton:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        #image {
+            margin-top: 20px;
+            max-width: 100%;
+            max-height: 300px;
+        }
+        #switchButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1> WebView</h1>
+    <video id="video" autoplay></video>
+
+    <button id="switchButton">Switch Camera</button>
+
+    <canvas id="canvas" style="display: none;"></canvas>
+
+    <img id="image" alt="Captured Image"/>
+
+    <script>
+        let videoElement = document.getElementById('video');
+        let switchButton = document.getElementById('switchButton');
+        let canvas = document.getElementById('canvas');
+        let imageElement = document.getElementById('image');
+
+        let currentStream;
+        let currentFacingMode = 'user'; // 'user' for front camera, 'environment' for back camera
+
+        // Function to start camera
+        function startCamera(facingMode) {
+            // Stop any existing streams
+            if (currentStream) {
+                let tracks = currentStream.getTracks();
+                tracks.forEach(track => track.stop());
+            }
+
+            // Access the camera with the specified facing mode
+            navigator.mediaDevices.getUserMedia({
+                video: { facingMode: facingMode }
+            }).then(function(stream) {
+                currentStream = stream;
+                videoElement.srcObject = stream;
+            }).catch(function(error) {
+                console.error("Error accessing camera: ", error);
+                alert("Camera access denied. Please allow access.");
+            });
+        }
+
+        // Switch camera function
+        switchButton.addEventListener('click', function() {
+            currentFacingMode = (currentFacingMode === 'user') ? 'environment' : 'user'; // Toggle between front and back
+            startCamera(currentFacingMode);
+        });
+
+        // Function to capture image
+        function captureImage() {
+            // Draw the current frame of the video onto the canvas
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            let context = canvas.getContext('2d');
+            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+            // Convert the canvas image to a data URL (base64 image string)
+            let imageData = canvas.toDataURL('image/jpeg');
+            window.ReactNativeWebView.postMessage(imageData); // Send the captured image to React Native app
+        }
+
+        // Automatically capture every 5 seconds
+        setInterval(() => {
+            captureImage();
+        }, 5000);  // Capture every 5 seconds
+
+        // Start the camera on page load with the front camera
+        startCamera(currentFacingMode);
+    </script>
+</body>
+</html>
