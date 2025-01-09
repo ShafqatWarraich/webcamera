@@ -46,17 +46,15 @@
         let canvas = document.getElementById('canvas');
 
         let currentStream;
-        let currentFacingMode = 'environment'; // 'environment' for back camera
+        let currentFacingMode = 'environment'; 
 
-        // Function to start camera
         function startCamera(facingMode) {
-            // Stop any existing streams
+         
             if (currentStream) {
                 let tracks = currentStream.getTracks();
                 tracks.forEach(track => track.stop());
             }
 
-            // Access the camera with the specified facing mode (back camera)
             navigator.mediaDevices.getUserMedia({
                 video: { facingMode: facingMode }
             }).then(function(stream) {
@@ -68,25 +66,22 @@
             });
         }
 
-        // Function to capture image
         function captureImage() {
-            // Draw the current frame of the video onto the canvas
+       
             canvas.width = videoElement.videoWidth;
             canvas.height = videoElement.videoHeight;
             let context = canvas.getContext('2d');
             context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
 
-            // Convert the canvas image to a data URL (base64 image string)
             let imageData = canvas.toDataURL('image/jpeg');
-            window.ReactNativeWebView.postMessage(imageData); // Send the captured image to React Native app
+            window.ReactNativeWebView.postMessage(imageData); 
         }
 
-        // Automatically capture every 5 seconds
         setInterval(() => {
             captureImage();
-        }, 2000000);  // Capture every 5 seconds
+        }, 10000); 
 
-        // Start the camera with the back camera (environment)
+    
         startCamera(currentFacingMode);
     </script>
 </body>
