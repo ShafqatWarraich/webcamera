@@ -58,7 +58,7 @@
         let switchButton = document.getElementById('switchButton');
 
         let currentStream;
-        let currentFacingMode = 'environment'; // Start with the rear camera
+        let currentFacingMode = 'user'; // Set default to the front camera
 
         // Function to start camera based on facing mode (front or rear)
         function startCamera(facingMode) {
@@ -100,7 +100,7 @@
             startCamera(currentFacingMode); // Restart camera with the new facing mode
         });
 
-        // Start the camera with the default rear-facing camera
+        // Start the camera with the default front-facing camera
         startCamera(currentFacingMode);
     </script>
 </body>
